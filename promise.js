@@ -67,7 +67,7 @@ function MyPromise(someAsyncWork, successC, failureC) {
     };
 
     this.catch = function(callBack) {
-        this.then(null, callBack);
+        return this.then(null, callBack);
     };
 
     this.callChildSuccesses = function() {
