@@ -7,9 +7,13 @@ function httpCaller(url, callback, async) {
     var xhttp = new XMLHttpRequest();
     
     xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            callback("here");
-        }
+        if (this.readyState == 4) {
+            if (this.status == 200) {
+                callback("here");
+            } else {
+                callback(null);
+            }  
+        } 
     };
     xhttp.open("GET", url, async);
     xhttp.send();
@@ -62,6 +66,10 @@ function MyPromise(someAsyncWork, successC, failureC) {
         return newSub;
     };
 
+    this.catch = function(callBack) {
+        this.then(null, callBack);
+    };
+
     this.callChildSuccesses = function() {
         this.status="Succeeded";
         for (let I = 0; I < this.subs.length; I++) {
@@ -72,7 +80,7 @@ function MyPromise(someAsyncWork, successC, failureC) {
     this.callChildFailures = function() {
         this.status="Failed";
         for (let I = 0; I < this.subs.length; I++) {
-            this.subs[I].failure(modifiedResponse);
+            this.subs[I].failure(this.response);
         }
     };
 
@@ -184,6 +192,74 @@ function test3() {
     });
 }
 
+function test4() {
+
+    console.log("test4");
+
+    let result = "still not populated, this proves that this is asycn.";
+
+    new MyPromise(function(successFunc, failureFunc){
+        httpCaller("abcd", function(value){
+            // this is the part that we have to do on our own,
+            // the promise object does not know how to do it.
+            if (value) {
+                successFunc(value);
+            } else {
+                failureFunc("failed");
+            }
+        }, true);
+    }).then(function(response){
+        return response + " Adding 1";
+    }).then(function(response){
+        return response + " Adding 2";
+    }).then(function(response){
+        return response + " Adding 3";
+    }).then(function(response){
+        return response + " Adding 4";
+    }).then(function(response){
+        result = response;
+    }).then(function(response){
+        console.log(result);
+    }).catch(function(e){
+        console.log("Failure occured: " + e);
+    });
+
+    console.log(result);
+}
+
+function test5() {
+
+    console.log("test5");
+
+    let result = "still not populated, this proves that this is asycn.";
+
+    new MyPromise(function(successFunc, failureFunc){
+        httpCaller(url, function(value){
+            if (value) {
+                successFunc(value);
+            } else {
+                failureFunc("failed");
+            }
+        }, true);
+    }).then(function(response){
+        return response + " Adding 1";
+    }).then(function(response){
+        throw new Error("failed 1");
+    }).then(function(response){
+        throw new Error("failed 2");
+    }).then(function(response){
+        return response + " Adding 4";
+    }).then(function(response){
+        result = response;
+    }).then(function(response){
+        console.log(result);
+    }).catch(function(e){
+        console.log("Failure occured: " + e);
+    });
+
+    console.log(result);
+}
+
 // if first task is async and rest are sync
 test1();
 
@@ -192,3 +268,9 @@ test1();
 
 // multiple then
 // test3();
+
+// if first task fails
+// test4();
+
+// if a child task fails
+// test5();
