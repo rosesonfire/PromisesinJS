@@ -1,0 +1,22 @@
+{
+  "name": "promisesinjavascript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "promise.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rosesonfire/PromisesinJS.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rosesonfire/PromisesinJS/issues"
+  },
+  "homepage": "https://github.com/rosesonfire/PromisesinJS#readme",
+  "dependencies": {
+    "xmlhttprequest": "^1.8.0"
+  }
+}
